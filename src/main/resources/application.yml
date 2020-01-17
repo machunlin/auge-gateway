@@ -1,5 +1,11 @@
 server:
-  port: 8800
+  port: 9000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 spring:
   application:
@@ -12,83 +18,32 @@ spring:
         locator:
           enabled: true #开启从注册中心动态创建路由的功能
           lower-case-service-id: true #使用小写服务名，默认是大写
-#      default-filters:
-#        - name: Hystrix
-#          args:
-#            name: myfallback
-#            fallbackUri: forward:/myfallback
-#        - name: Retry
-#          args:
-#            retries: 2 #需要进行重试的次数
-#            statuses: BAD_GATEWAY #返回哪个状态码需要进行重试，返回状态码为5XX进行重试
-#            backoff:
-#              firstBackoff: 10ms
-#              maxBackoff: 50ms
-#              factor: 2
-#              basedOnPreviousValue: false
+      default-filters:
+        - name: Hystrix
+          args:
+            name: myfallback
+            fallbackUri: forward:/myfallback
+        - name: Retry
+          args:
+            retries: 2 #需要进行重试的次数
+            statuses: BAD_GATEWAY #返回哪个状态码需要进行重试，返回状态码为5XX进行重试
+            backoff:
+              firstBackoff: 10ms
+              maxBackoff: 50ms
+              factor: 2
+              basedOnPreviousValue: false
 #        - name: RequestRateLimiter
 #          args:
 #            redis-rate-limiter.replenishRate: 100
       routes:
         - id: route-base-service #路由的ID
-          ## uri 目标服务地址
-#          uri: lb://base-data-service # uri以lb://开头（lb代表从注册中心获取服务），后面接的就是你需要转发到的服务名称
+          ## uri 需要转发的目标地址,以lb://开头代表从注册中心获取服务
           uri: http://127.0.0.1:8088/base
           predicates: # 路径相匹配的进行路由
             - Path=/base/**
 
         - id: route-exam-service
-#            uri: lb://exam-manage-service
-          uri: http://127.0.0.1:8091/exam-manage
+          uri: lb://exam-manage-service
+          #          uri: http://127.0.0.1:8091/exam-manage
           predicates:
             - Path=/exam-manage/**
-#          filters:
-#            - name: Hystrix
-#              args:
-#                name: myfallback2
-#                fallbackUri: forward:/myfallback2
-
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
-##健康检查http://127.0.0.1:9091/actuator/health
-management:
-#  server:
-#    port: 9091
-#  # Dubbo Health
-#  health:
-#    dubbo:
-#      status:
-#        ## StatusChecker Name defaults (default : "memory", "load" )
-#        defaults: memory
-#  # Enables Dubbo All Endpoints
-#  endpoint:
-#    dubbo:
-#      enabled: true
-#    dubbo-shutdown:
-#      enabled: true
-#    dubbo-configs:
-#      enabled: true
-#    dubbo-services:
-#      enabled: true
-#    dubbo-references:
-#      enabled: true
-#    dubbo-properties:
-#      enabled: true
-#    health:
-#      show-details: always
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
-
-#logging:
-#  level:
-#    org.springframework.cloud.gateway: trace
-#    org.springframework.http.server.reactive: info
-#    org.springframework.web.reactive: info
-#    reactor.ipc.netty: info
-#    com.auge.gateway: debug
