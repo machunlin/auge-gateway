@@ -2,6 +2,22 @@ server:
   port: 9000
 
 management:
+  # Enables Dubbo All Endpoints
+  endpoint:
+    dubbo:
+      enabled: true
+    dubbo-shutdown:
+      enabled: true
+    dubbo-configs:
+      enabled: true
+    dubbo-services:
+      enabled: true
+    dubbo-references:
+      enabled: true
+    dubbo-properties:
+      enabled: true
+    health:
+      show-details: always
   endpoints:
     web:
       exposure:
@@ -21,7 +37,7 @@ spring:
       default-filters:
         - name: Hystrix
           args:
-            name: myfallback
+            name: fallbackcmd
             fallbackUri: forward:/myfallback
         - name: Retry
           args:
@@ -32,16 +48,12 @@ spring:
               maxBackoff: 50ms
               factor: 2
               basedOnPreviousValue: false
-#        - name: RequestRateLimiter
-#          args:
-#            redis-rate-limiter.replenishRate: 100
       routes:
         - id: route-base-service #路由的ID
           ## uri 需要转发的目标地址,以lb://开头代表从注册中心获取服务
           uri: http://127.0.0.1:8088/base
           predicates: # 路径相匹配的进行路由
             - Path=/base/**
-
         - id: route-exam-service
           uri: lb://exam-manage-service
           #          uri: http://127.0.0.1:8091/exam-manage
